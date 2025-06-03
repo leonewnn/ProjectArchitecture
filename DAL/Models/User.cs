@@ -1,21 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjectArchitecture.Models
+namespace DAL.Models
 {
     public class User
     {
-        public int UserId { get; set; } // Clé primaire par convention EF
-        public string Uid { get; set; } // Identifiant métier/externe
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public int CardNumber { get; set; }
-        public decimal Balance { get; set; }
-        public string Role { get; set; }
-
+        [Key]
+        public string Uid { get; set; } = string.Empty;
+        
+        [Required]
+        [MaxLength(100)]
+        public string Username { get; set; } = string.Empty;
+        
+        [Required]
+        [MaxLength(50)]
+        public string CardId { get; set; } = string.Empty;
+        
         public int FacultyId { get; set; }
-        public Faculty Faculty { get; set; }
-
-        public List<Transaction> Transactions { get; set; }
-        public List<PrintJob> PrintJobs { get; set; }
+        
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal QuotaChf { get; set; }
+        
+        // Navigation property
+        public virtual Faculty Faculty { get; set; } = null!;
     }
 }
