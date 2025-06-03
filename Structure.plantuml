@@ -1,0 +1,288 @@
+@startuml Printer - Clean Architecture MVC + Helper only DAL access
+
+!define ENTITY_COLOR #E8F5E8
+!define DTO_COLOR #E8E8F5
+!define CONTROLLER_COLOR #F5E8E8
+!define SERVICE_COLOR #F5F5E8
+!define VIEW_COLOR #FFF5E8
+
+package "DAL.Models" {
+    class User <<Entity>> ENTITY_COLOR {
+        + int UserId
+        + string Uid
+        + string Username
+        + string Password
+        + decimal Balance
+        + string Role
+        + int FacultyId
+        --
+        + Faculty Faculty
+        + ICollection<PrintJob> PrintJobs
+        + ICollection<Transaction> Transactions
+    }
+    class Faculty <<Entity>> ENTITY_COLOR {
+        + int FacultyId
+        + string Name
+        --
+        + ICollection<User> Users
+    }
+    class PrintJob <<Entity>> ENTITY_COLOR {
+        + int PrintJobId
+        + int UserId
+        + int PagesPrinted
+        + decimal CostChf
+        + DateTime Date
+        + string TypeCode
+        + string Description
+        --
+        + User User
+        + PrintType PrintType
+    }
+    class Transaction <<Entity>> ENTITY_COLOR {
+        + int TransactionId
+        + int UserId
+        + string TypeCode
+        + decimal Amount
+        + DateTime Date
+        --
+        + User User
+    }
+    class PrintType <<Entity>> ENTITY_COLOR {
+        + string TypeCode
+        + decimal PricePerPage
+        --
+        + ICollection<PrintJob> PrintJobs
+    }
+}
+
+package "DAL" {
+    class MyPrintCBContext <<DbContext>> ENTITY_COLOR {
+        + DbSet<User> Users
+        + DbSet<PrintJob> PrintJobs
+        + DbSet<Transaction> Transactions
+        + DbSet<Faculty> Faculties
+        + DbSet<PrintType> PrintTypes
+        --
+        + OnConfiguring(DbContextOptionsBuilder)
+        + OnModelCreating(ModelBuilder)
+    }
+}
+
+package "WebAPI_Printer.Models" {
+    class UserDto <<DTO>> DTO_COLOR {
+        + string Uid
+        + string Username
+        + decimal Balance
+        + string FacultyName
+    }
+    class FacultyDto <<DTO>> DTO_COLOR {
+        + int FacultyId
+        + string Name
+    }
+    class PrintJobDto <<DTO>> DTO_COLOR {
+        + int PrintJobId
+        + string UserId
+        + int PagesPrinted
+        + decimal CostChf
+        + DateTime Date
+        + string TypeCode
+        + string Description
+    }
+    class TransactionDto <<DTO>> DTO_COLOR {
+        + int TransactionId
+        + string UserId
+        + string TypeCode
+        + decimal Amount
+        + DateTime Date
+    }
+    class PrintTypeDto <<DTO>> DTO_COLOR {
+        + string TypeCode
+        + decimal PricePerPage
+    }
+    class AddMoneyDto <<DTO>> DTO_COLOR {
+        + string Uid
+        + decimal Amount
+    }
+
+    class PrintRequestDto <<DTO>> DTO_COLOR {
+        + string UserId
+        + int PagesPrinted
+        + string TypeCode
+        + string Description
+    }
+    class QuotaDto <<DTO>> DTO_COLOR {
+        + int FacultyId
+        + decimal Amount
+    }
+}
+
+package "WebAPI_Printer.Extension" {
+    class ConverterExtensions <<Static>> DTO_COLOR {
+        + {static} UserDto ToModel(User user)
+        + {static} User ToDAL(UserDto userDto)
+        + {static} FacultyDto ToModel(Faculty faculty)
+        + {static} Faculty ToDAL(FacultyDto facultyDto)
+        + {static} PrintJobDto ToModel(PrintJob job)
+        + {static} PrintJob ToDAL(PrintJobDto jobDto)
+        + {static} TransactionDto ToModel(Transaction transaction)
+        + {static} Transaction ToDAL(TransactionDto transactionDto)
+        + {static} PrintTypeDto ToModel(PrintType printType)
+        + {static} PrintType ToDAL(PrintTypeDto printTypeDto)
+        + {static} AddMoneyCommand ToCommand(AddMoneyDto addMoneyDto)
+        + {static} PrintRequestCommand ToCommand(PrintRequestDto printRequestDto)
+        + {static} QuotaCommand ToCommand(QuotaDto quotaDto)
+    }
+}
+
+package "WebAPI_Printer.Helper" {
+    interface IComputationHelper <<Helper>> SERVICE_COLOR {
+        + Task<UserDto> GetBalance(string uid)
+        + Task<UserDto> AddMoney(AddMoneyDto cmd)
+        + Task<PrintJobDto> RequestPrint(PrintRequestDto cmd)
+        + Task<QuotaResultDto> DistributeQuota(QuotaDto cmd)
+    }
+    class ComputationHelper <<Helper>> SERVICE_COLOR {
+        - MyPrintCBContext _repo
+        + Task<UserDto> GetBalance(string uid)
+        + Task<UserDto> AddMoney(AddMoneyDto cmd)
+        + Task<PrintJobDto> RequestPrint(PrintRequestDto cmd)
+        + Task<QuotaResultDto> DistributeQuota(QuotaDto cmd)
+    }
+    IComputationHelper <|.. ComputationHelper
+    ComputationHelper --> MyPrintCBContext : "uses DAL"
+}
+
+package "WebAPI_Printer.Controllers" {
+    class UserController <<ApiController>> CONTROLLER_COLOR {
+        + Task<ActionResult<UserDto>> GetBalance(string uid)
+        + Task<ActionResult<UserDto>> AddMoney(AddMoneyDto cmd)
+    }
+    class PrintController <<ApiController>> CONTROLLER_COLOR {
+        + Task<ActionResult<PrintJobDto>> RequestPrint(PrintRequestDto cmd)
+    }
+    class QuotaController <<ApiController>> CONTROLLER_COLOR {
+        + Task<ActionResult<QuotaResultDto>> DistributeQuota(QuotaDto cmd)
+    }
+}
+
+' Relations entre les controllers et le helper
+UserController --> IComputationHelper
+PrintController --> IComputationHelper
+QuotaController --> IComputationHelper
+
+' Entity relations
+User ||--o{ PrintJob : "has"
+User ||--o{ Transaction : "has"
+Faculty ||--o{ User : "has"
+PrintJob ||--o{ PrintType : "has"
+Transaction ||--o{ User : "has"
+
+package "MVC_Printer.Controllers" {
+    class HomeController <<MvcController>> VIEW_COLOR {
+        + IActionResult Index()
+        + IActionResult Error()
+    }
+    class UsersController <<MvcController>> VIEW_COLOR {
+        - IPrinterServices _printerServices
+        + Task<IActionResult> Index()
+        + Task<IActionResult> Details(string uid)
+        + IActionResult AddMoney()
+        + Task<IActionResult> AddMoney(AddMoneyViewModel model)
+    }
+    class PrintJobsController <<MvcController>> VIEW_COLOR {
+        - IPrinterServices _printerServices
+        + Task<IActionResult> Index()
+        + Task<IActionResult> Create()
+        + Task<IActionResult> Create(PrintJobViewModel model)
+    }
+
+    class QuotaController <<MvcController>> VIEW_COLOR {
+        - IPrinterServices _printerServices
+        + IActionResult SendSemesterQuota()
+        + Task<IActionResult> SendSemesterQuota(SendSemesterQuotaViewModel model)
+    }
+}
+
+package "MVC_Printer.Services" {
+    interface IPrinterServices <<Service>> SERVICE_COLOR {
+        + Task<List<UserViewModel>> GetUsers()
+        + Task<UserViewModel> GetUser(string uid)
+        + Task<UserViewModel> AddMoney(AddMoneyViewModel model)
+        + Task<List<PrintJobViewModel>> GetPrintJobs()
+        + Task<PrintJobViewModel> RequestPrint(PrintJobRequestViewModel model)
+        + Task SendSemesterQuota(SendSemesterQuotaViewModel model)
+    }
+    class PrinterServices <<Service>> SERVICE_COLOR {
+        - HttpClient _client
+        - string _baseUrl
+        + Task<List<UserViewModel>> GetUsers()
+        + Task<UserViewModel> GetUser(string uid)
+        + Task<UserViewModel> AddMoney(AddMoneyViewModel model)
+        + Task<List<PrintJobViewModel>> GetPrintJobs()
+        + Task<PrintJobViewModel> RequestPrint(PrintJobRequestViewModel model)
+        + Task SendSemesterQuota(SendSemesterQuotaViewModel model)
+    }
+    IPrinterServices <|.. PrinterServices
+}
+
+package "MVC_Printer.Models" {
+    class UserViewModel <<ViewModel>> VIEW_COLOR {
+        + string Uid
+        + string Username
+        + decimal Balance
+        + string FacultyName
+    }
+    class PrintJobViewModel <<ViewModel>> VIEW_COLOR {
+        + int PrintJobId
+        + string UserId
+        + int PagesPrinted
+        + decimal CostChf
+        + DateTime Date
+        + string TypeCode
+        + string Description
+    }
+
+    class PrintJobRequestViewModel <<ViewModel>> VIEW_COLOR {
+        + string UserId
+        + int PagesPrinted
+        + string TypeCode
+        + string Description
+    }
+    class AddMoneyViewModel <<ViewModel>> VIEW_COLOR {
+        + string Uid
+        + decimal Amount
+    }
+
+    class SendSemesterQuotaViewModel <<ViewModel>> VIEW_COLOR {
+        + int FacultyId
+        + decimal Amount
+    }
+    class ErrorViewModel <<ViewModel>> VIEW_COLOR {
+        + string RequestId
+        + bool ShowRequestId
+    }
+}
+
+package "MVC_Printer.Views" {
+    class "Home/Index.cshtml" <<RazorView>> VIEW_COLOR
+    class "Users/Index.cshtml" <<RazorView>> VIEW_COLOR
+    class "Users/AddMoney.cshtml" <<RazorView>> VIEW_COLOR
+    class "PrintJobs/Index.cshtml" <<RazorView>> VIEW_COLOR
+    class "PrintJobs/Create.cshtml" <<RazorView>> VIEW_COLOR
+    class "Quota/SendSemesterQuota.cshtml" <<RazorView>> VIEW_COLOR
+}
+
+' MVC relation
+PrinterServices --> "WebAPI via HttpClient" : "calls"
+UsersController --> IPrinterServices : "uses"
+PrintJobsController --> IPrinterServices : "uses"
+QuotaController --> IPrinterServices : "uses"
+
+' MVC View relations
+PrinterServices ..> UserViewModel : "uses"
+PrinterServices ..> PrintJobViewModel : "uses"
+PrinterServices ..> PrintJobRequestViewModel : "uses"
+PrinterServices ..> SendSemesterQuotaViewModel : "uses"
+PrinterServices ..> AddMoneyViewModel : "uses"
+
+@enduml

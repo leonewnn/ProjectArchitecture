@@ -4,12 +4,12 @@ namespace ProjectArchitecture.Models
 {
     public class User
     {
-        public int UserId { get; set; }
-        public string Uid { get; set; }
+        public int UserId { get; set; } // Clé primaire par convention EF
+        public string Uid { get; set; } // Identifiant métier/externe
         public string Username { get; set; }
         public string Password { get; set; }
         public int CardNumber { get; set; }
-        public decimal Solde { get; set; }
+        public decimal Balance { get; set; }
         public string Role { get; set; }
 
         public int FacultyId { get; set; }

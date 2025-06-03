@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(MyPrintCBContext))]
-    [Migration("20250417133426_InitialCreate")]
+    [Migration("20250603140612_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -63,14 +63,37 @@ namespace DAL.Migrations
                     b.Property<int>("PagesPrinted")
                         .HasColumnType("int");
 
+                    b.Property<string>("PrintTypeTypeCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TypeCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("PrintJobId");
 
+                    b.HasIndex("PrintTypeTypeCode");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("PrintJobs");
+                });
+
+            modelBuilder.Entity("ProjectArchitecture.Models.PrintType", b =>
+                {
+                    b.Property<string>("TypeCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("PricePerPage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("TypeCode");
+
+                    b.ToTable("PrintTypes");
                 });
 
             modelBuilder.Entity("ProjectArchitecture.Models.Transaction", b =>
@@ -87,7 +110,7 @@ namespace DAL.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("TypeCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -109,6 +132,9 @@ namespace DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("CardNumber")
                         .HasColumnType("int");
 
@@ -122,9 +148,6 @@ namespace DAL.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Solde")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Uid")
                         .IsRequired()
@@ -143,11 +166,19 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("ProjectArchitecture.Models.PrintJob", b =>
                 {
+                    b.HasOne("ProjectArchitecture.Models.PrintType", "PrintType")
+                        .WithMany("PrintJobs")
+                        .HasForeignKey("PrintTypeTypeCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ProjectArchitecture.Models.User", "User")
                         .WithMany("PrintJobs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("PrintType");
 
                     b.Navigation("User");
                 });
@@ -177,6 +208,11 @@ namespace DAL.Migrations
             modelBuilder.Entity("ProjectArchitecture.Models.Faculty", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("ProjectArchitecture.Models.PrintType", b =>
+                {
+                    b.Navigation("PrintJobs");
                 });
 
             modelBuilder.Entity("ProjectArchitecture.Models.User", b =>

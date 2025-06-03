@@ -25,6 +25,18 @@ namespace DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PrintTypes",
+                columns: table => new
+                {
+                    TypeCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PricePerPage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrintTypes", x => x.TypeCode);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -34,7 +46,7 @@ namespace DAL.Migrations
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardNumber = table.Column<int>(type: "int", nullable: false),
-                    Solde = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FacultyId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -59,11 +71,19 @@ namespace DAL.Migrations
                     PagesPrinted = table.Column<int>(type: "int", nullable: false),
                     CostChf = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TypeCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PrintTypeTypeCode = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PrintJobs", x => x.PrintJobId);
+                    table.ForeignKey(
+                        name: "FK_PrintJobs_PrintTypes_PrintTypeTypeCode",
+                        column: x => x.PrintTypeTypeCode,
+                        principalTable: "PrintTypes",
+                        principalColumn: "TypeCode",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PrintJobs_Users_UserId",
                         column: x => x.UserId,
@@ -79,7 +99,7 @@ namespace DAL.Migrations
                     TransactionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TypeCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -93,6 +113,11 @@ namespace DAL.Migrations
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrintJobs_PrintTypeTypeCode",
+                table: "PrintJobs",
+                column: "PrintTypeTypeCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PrintJobs_UserId",
@@ -118,6 +143,9 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Transactions");
+
+            migrationBuilder.DropTable(
+                name: "PrintTypes");
 
             migrationBuilder.DropTable(
                 name: "Users");
