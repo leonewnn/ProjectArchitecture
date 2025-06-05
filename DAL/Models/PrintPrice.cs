@@ -5,7 +5,7 @@ namespace DAL.Models
 {
     public class PrintPrice
     {
-//asfddfqwrestd
+//asfddfqwrestddwe
         [Key]
         [MaxLength(10)]
         public string TypeCode { get; set; } = string.Empty;
