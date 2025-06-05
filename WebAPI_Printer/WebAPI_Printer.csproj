@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DAL\DAL.csproj" />
+    <ProjectReference Include="..\MVC_Printer\MVC_Printer.csproj" />
   </ItemGroup>
 
 </Project>

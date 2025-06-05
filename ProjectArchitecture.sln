@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_Printer", "WebAPI_Printer\WebAPI_Printer.csproj", "{2B17739F-D4ED-42BF-A821-81333B342317}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Printer", "MVC_Printer\MVC_Printer.csproj", "{2B13CECE-1BAA-41CA-95D6-7918DED97D0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2B17739F-D4ED-42BF-A821-81333B342317}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B17739F-D4ED-42BF-A821-81333B342317}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B17739F-D4ED-42BF-A821-81333B342317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B13CECE-1BAA-41CA-95D6-7918DED97D0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B13CECE-1BAA-41CA-95D6-7918DED97D0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B13CECE-1BAA-41CA-95D6-7918DED97D0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B13CECE-1BAA-41CA-95D6-7918DED97D0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -58,7 +58,7 @@ namespace DAL
                 }
 
                 // PrintPrices
-                var printPrice1 = new PrintPrice() { TypeCode = "A4_BW", PricePerPage = 0.05m };
+                var printPrice1 = new PrintPrice() { TypeCode = "A4_BW", PricePerPage = 0.08m };
                 var printPrice = context.Set<PrintPrice>().FirstOrDefault(p => p.TypeCode == "A4_BW");
                 if (printPrice == null)
                 {
