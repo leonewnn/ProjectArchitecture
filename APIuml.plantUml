@@ -1,0 +1,133 @@
+@startuml Printer - Full Architecture with Mapper Extensions
+
+!define ENTITY_COLOR #E8F5E8
+!define DTO_COLOR    #E8E8F5
+!define CONTROLLER_COLOR #F5E8E8
+!define SERVICE_COLOR    #F5F5E8
+!define EXTENSION_COLOR  #F5F5F5
+
+' ==== DAL Layer ==== 
+package "WebAPI_Printer.DAL.Models" {
+    class User <<Entity>> ENTITY_COLOR {
+        + string  Uid
+        + string  Username
+        + string  CardId
+        + int     FacultyId
+        + decimal QuotaChf
+    }
+
+    class Faculty <<Entity>> ENTITY_COLOR {
+        + int    FacultyId
+        + string Name
+    }
+
+    class PrintPrice <<Entity>> ENTITY_COLOR {
+        + string  TypeCode
+        + decimal PricePerPage
+    }
+}
+
+User       -->  Faculty      : FacultyId
+
+' ==== API DTOs ==== 
+package "WebAPI_Printer.Models" {
+    class AddMoneyDto <<DTO>> DTO_COLOR {
+        + string  CardId
+        + string  Username
+        + decimal Amount
+    }
+
+    class FormatPagesDto <<DTO>> DTO_COLOR {
+        + string TypeCode
+        + int    PagesAvailable
+    }
+
+    class PrintQuotaResultDto <<DTO>> DTO_COLOR {
+        + string               UserId
+        + decimal              QuotaChf
+        + List<FormatPagesDto> Formats
+    }
+
+    class UserBalanceDto <<DTO>> DTO_COLOR {
+        + string  Uid
+        + string  Username
+        + decimal Balance
+    }
+
+    class FacultyDto <<DTO>> DTO_COLOR {
+        + int    FacultyId
+        + string Name
+    }
+}
+
+' ==== Mapper Extensions ==== 
+package "WebAPI_Printer.Extensions" {
+    class ConverterExtensions <<Static>> EXTENSION_COLOR {
+        + UserBalanceDto             ToUserBalanceDto(User user)
+        + FacultyDto                 ToFacultyDto(Faculty faculty)
+        + FormatPagesDto             ToFormatPagesDto(PrintPrice price, decimal quotaChf)
+        + PrintQuotaResultDto        ToPrintQuotaResultDto(User user, List<PrintPrice> prices)
+    }
+}
+
+' ==== Service Layer ==== 
+package "WebAPI_Printer.Services" {
+    interface IUserService <<Service>> SERVICE_COLOR {
+        + Task AddMoney(AddMoneyDto request)
+    }
+    class UserService <<Service>> SERVICE_COLOR {
+        - PrinterContext _context
+        + Task AddMoney(AddMoneyDto request)
+    }
+    IUserService <|.. UserService
+
+    interface IPrintService <<Service>> SERVICE_COLOR {
+        + Task<PrintQuotaResultDto> GetQuota(string userId)
+    }
+    class PrintService <<Service>> SERVICE_COLOR {
+        - PrinterContext _context
+        + Task<PrintQuotaResultDto> GetQuota(string userId)
+    }
+    IPrintService <|.. PrintService
+
+    interface IFacultyService <<Service>> SERVICE_COLOR {
+        + Task<List<UserBalanceDto>> GetUsersByFaculty(int facultyId)
+        + Task<List<FacultyDto>>      GetFaculties()
+    }
+    class FacultyService <<Service>> SERVICE_COLOR {
+        - PrinterContext _context
+        + Task<List<UserBalanceDto>> GetUsersByFaculty(int facultyId)
+        + Task<List<FacultyDto>>     GetFaculties()
+    }
+    IFacultyService <|.. FacultyService
+}
+
+' Mapper usage arrows
+UserService ..> ConverterExtensions : "uses"
+PrintService ..> ConverterExtensions : "uses"
+FacultyService ..> ConverterExtensions : "uses"
+
+' ==== Controller Layer ==== 
+package "WebAPI_Printer.Controllers" {
+    class UserController <<ApiController>> CONTROLLER_COLOR {
+        - IUserService _userService
+        + Task<ActionResult> AddMoney(AddMoneyDto request)
+    }
+
+    class PrintController <<ApiController>> CONTROLLER_COLOR {
+        - IPrintService _printService
+        + Task<ActionResult<PrintQuotaResultDto>> GetQuota(string userId)
+    }
+
+    class FacultyController <<ApiController>> CONTROLLER_COLOR {
+        - IFacultyService _facultyService
+        + Task<ActionResult<List<UserBalanceDto>>> GetUsersByFaculty(int facultyId)
+        + Task<ActionResult<List<FacultyDto>>>      GetFaculties()
+    }
+}
+
+UserController    --> IUserService
+PrintController   --> IPrintService  
+FacultyController --> IFacultyService
+
+@enduml

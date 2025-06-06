@@ -1,0 +1,37 @@
+@model List<MVC_Printer.Models.FacultyViewModel>
+
+@{
+    ViewData["Title"] = "Select Faculty";
+}
+
+<h1>Select Faculty</h1>
+
+<h4>Choose a faculty to add quota to students</h4>
+<hr />
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var faculty in Model)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@faculty.Name</h5>
+                        <a asp-action="AddQuotaToFaculty" asp-route-facultyId="@faculty.FacultyId" class="btn btn-primary">
+                            Select Faculty
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No faculties available.</p>
+}
+
+<div>
+    <a asp-action="Index">Back to Home</a>
+</div>

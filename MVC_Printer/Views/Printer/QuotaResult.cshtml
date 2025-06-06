@@ -1,0 +1,53 @@
+@* filepath: MVC_Printer/Views/Printer/QuotaResult.cshtml *@
+@model MVC_Printer.Models.PrintQuotaViewModel
+
+@{
+    ViewData["Title"] = "Quota Result";
+}
+
+<h1>Balance & Pages Available</h1>
+
+<h4>User: @Model.UserId</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Current Balance</h5>
+        <p><strong>@Model.QuotaChf.ToString("0.00") CHF</strong></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <h5>Pages Available by Format</h5>
+        @if (Model.Formats.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Format Type</th>
+                        <th>Pages Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var format in Model.Formats)
+                    {
+                        <tr>
+                            <td>@format.TypeCode</td>
+                            <td>@format.PagesAvailable</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No format information available.</p>
+        }
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to Home</a> |
+    <a asp-action="AddMoney">Add Money</a>
+</div>
