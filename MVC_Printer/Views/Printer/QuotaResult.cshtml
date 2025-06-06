@@ -5,161 +5,49 @@
     ViewData["Title"] = "Quota Result";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-chart-bar"></i> Balance & Pages Available</h1>
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
+<h1>Balance & Pages Available</h1>
+
+<h4>User: @Model.UserId</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Current Balance</h5>
+        <p><strong>@Model.QuotaChf.ToString("0.00") CHF</strong></p>
+    </div>
 </div>
 
 <div class="row">
-    <!-- Balance Info -->
-    <div class="col-md-4 mb-4">
-        <div class="card border-info">
-            <div class="card-header bg-info text-white text-center">
-                <h5 class="mb-0"><i class="fas fa-wallet"></i> Account Balance</h5>
-            </div>
-            <div class="card-body text-center">
-                <h2 class="text-info">@Model.QuotaChf.ToString("C") CHF</h2>
-                <p class="text-muted">User ID: <code>@Model.UserId</code></p>
-                <div class="mt-2">
-                    @if (Model.QuotaChf > 20)
+    <div class="col-md-8">
+        <h5>Pages Available by Format</h5>
+        @if (Model.Formats.Any())
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Format Type</th>
+                        <th>Pages Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var format in Model.Formats)
                     {
-                        <span class="badge bg-success fs-6">Excellent Balance</span>
+                        <tr>
+                            <td>@format.TypeCode</td>
+                            <td>@format.PagesAvailable</td>
+                        </tr>
                     }
-                    else if (Model.QuotaChf > 10)
-                    {
-                        <span class="badge bg-primary fs-6">Good Balance</span>
-                    }
-                    else if (Model.QuotaChf > 5)
-                    {
-                        <span class="badge bg-warning fs-6">Low Balance</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger fs-6">Critical Balance</span>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pages Available -->
-    <div class="col-md-8 mb-4">
-        <div class="card border-success">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-file-alt"></i> Pages Available by Format</h5>
-            </div>
-            <div class="card-body">
-                @if (Model.Formats.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Format Type</th>
-                                    <th>Description</th>
-                                    <th class="text-end">Pages Available</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var format in Model.Formats)
-                                {
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-primary">@format.TypeCode</span>
-                                        </td>
-                                        <td>
-                                            @switch (format.TypeCode)
-                                            {
-                                                case "A4_BW":
-                                                    <span>A4 Black & White</span>
-                                                    break;
-                                                case "A4_COLOR":
-                                                    <span>A4 Color</span>
-                                                    break;
-                                                case "A3_BW":
-                                                    <span>A3 Black & White</span>
-                                                    break;
-                                                case "A3_COLOR":
-                                                    <span>A3 Color</span>
-                                                    break;
-                                                default:
-                                                    <span>@format.TypeCode</span>
-                                                    break;
-                                            }
-                                        </td>
-                                        <td class="text-end">
-                                            <strong class="@(format.PagesAvailable > 100 ? "text-success" : format.PagesAvailable > 50 ? "text-warning" : "text-danger")">
-                                                @format.PagesAvailable pages
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i> No format information available.
-                    </div>
-                }
-            </div>
-        </div>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No format information available.</p>
+        }
     </div>
 </div>
 
-<!-- Summary Card -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Summary</h5>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-3">
-                        <h6>Current Balance</h6>
-                        <span class="badge bg-info fs-6">@Model.QuotaChf.ToString("C") CHF</span>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Available Formats</h6>
-                        <span class="badge bg-success fs-6">@Model.Formats.Count format(s)</span>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Total Pages</h6>
-                        <span class="badge bg-primary fs-6">@Model.Formats.Sum(f => f.PagesAvailable) pages</span>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Best Format</h6>
-                        @{
-                            var bestFormat = Model.Formats.OrderByDescending(f => f.PagesAvailable).FirstOrDefault();
-                        }
-                        @if (bestFormat != null)
-                        {
-                            <span class="badge bg-warning fs-6">@bestFormat.TypeCode</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary fs-6">N/A</span>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Action Buttons -->
-<div class="row mt-4">
-    <div class="col-12 text-center">
-        <a asp-action="AddMoney" class="btn btn-success btn-lg me-3">
-            <i class="fas fa-plus-circle"></i> Add More Money
-        </a>
-        <a asp-action="Index" class="btn btn-outline-primary btn-lg">
-            <i class="fas fa-home"></i> Back to Home
-        </a>
-    </div>
+<div>
+    <a asp-action="Index">Back to Home</a> |
+    <a asp-action="AddMoney">Add Money</a>
 </div>

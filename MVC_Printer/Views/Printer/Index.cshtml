@@ -1,87 +1,40 @@
 @* filepath: MVC_Printer/Views/Printer/Index.cshtml *@
 @{
-    ViewData["Title"] = "Printer Management System";
+    ViewData["Title"] = "Printer Management";
 }
 
-<div class="text-center">
-    <h1 class="display-4">🖨️ Printer Management System</h1>
-    <p class="lead">Manage your printing account and check available pages</p>
-</div>
+<h1>Printer Management</h1>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle"></i> @TempData["Success"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-success">
+        @TempData["Success"]
     </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-danger">
+        @TempData["Error"]
     </div>
 }
 
 <div class="row">
-    <!-- Check Balance and Pages -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-primary">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-search"></i> Check Balance & Pages Available</h5>
+    <div class="col-md-6">
+        <h4>Check Balance & Pages</h4>
+        <form asp-action="GetQuota" method="post">
+            <div class="form-group">
+                <label for="userId" class="control-label">User ID</label>
+                <input type="text" class="form-control" id="userId" name="userId" required>
             </div>
-            <div class="card-body">
-                <p class="card-text">Enter your User ID to check your current balance and available pages for printing.</p>
-                
-                <form asp-action="GetQuota" method="post">
-                    <div class="mb-3">
-                        <label for="userId" class="form-label">User ID:</label>
-                        <input type="text" class="form-control" id="userId" name="userId" 
-                               placeholder="e.g., user001, user002..." required>
-                        <div class="form-text">Try: user001, user002, user003, user004, user005, user006</div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-calculator"></i> Get Balance & Pages Available
-                    </button>
-                </form>
+            <div class="form-group">
+                <input type="submit" value="Get Quota" class="btn btn-primary" />
             </div>
-        </div>
+        </form>
     </div>
-
-    <!-- Add Money -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 border-success">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add Money</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Add money to your printing account using your Card ID or Username.</p>
-                
-                <a asp-action="AddMoney" class="btn btn-success btn-lg">
-                    <i class="fas fa-money-bill-wave"></i> Add Money to Account
-                </a>
-                
-                <div class="mt-3">
-                    <small class="text-muted">
-                        <strong>Available Cards:</strong> CARD001, CARD002, CARD003, CARD004, CARD005, CARD006<br>
-                        <strong>Available Users:</strong> alice.martin, bob.smith, claire.johnson, david.brown, emma.wilson, felix.anderson
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- API Status -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="alert alert-info">
-            <h6><i class="fas fa-info-circle"></i> System Information</h6>
-            <p class="mb-0">
-                <strong>API URL:</strong> <code>https://localhost:7086/api/</code><br>
-                <small class="text-muted">Make sure the WebAPI_Printer is running on this port.</small>
-            </p>
-        </div>
+    <div class="col-md-6">
+        <h4>Add Money</h4>
+        <p>Add money to your printing account.</p>
+        <a asp-action="AddMoney" class="btn btn-success">Add Money</a>
     </div>
 </div>

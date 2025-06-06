@@ -5,64 +5,38 @@
     ViewData["Title"] = "Add Money";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                <h3 class="mb-0 text-center">
-                    <i class="fas fa-plus-circle"></i> Add Money to Account
-                </h3>
+<h1>Add Money</h1>
+
+<h4>AddMoneyViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddMoney">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CardId" class="control-label"></label>
+                <input asp-for="CardId" class="form-control" />
+                <span asp-validation-for="CardId" class="text-danger"></span>
             </div>
-            <div class="card-body">
-                <form asp-action="AddMoney" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                    
-                    <div class="mb-3">
-                        <label asp-for="CardId" class="form-label">
-                            <i class="fas fa-credit-card"></i> @Html.DisplayNameFor(m => m.CardId)
-                        </label>
-                        <input asp-for="CardId" class="form-control" placeholder="e.g., CARD001, CARD002..." />
-                        <span asp-validation-for="CardId" class="text-danger"></span>
-                        <div class="form-text">Available: CARD001, CARD002, CARD003, CARD004, CARD005, CARD006</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Username" class="form-label">
-                            <i class="fas fa-user"></i> @Html.DisplayNameFor(m => m.Username)
-                        </label>
-                        <input asp-for="Username" class="form-control" placeholder="e.g., alice.martin, bob.smith..." />
-                        <span asp-validation-for="Username" class="text-danger"></span>
-                        <div class="form-text">Available: alice.martin, bob.smith, claire.johnson, david.brown, emma.wilson, felix.anderson</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Amount" class="form-label">
-                            <i class="fas fa-money-bill-wave"></i> @Html.DisplayNameFor(m => m.Amount)
-                        </label>
-                        <div class="input-group">
-                            <input asp-for="Amount" class="form-control" step="0.01" min="0.01" max="1000" placeholder="10.50" />
-                            <span class="input-group-text">CHF</span>
-                        </div>
-                        <span asp-validation-for="Amount" class="text-danger"></span>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> 
-                        <strong>Important:</strong> Please provide either Card ID or Username (not both).
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <i class="fas fa-save"></i> Add Money
-                        </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                    </div>
-                </form>
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
             </div>
-        </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add Money" class="btn btn-primary" />
+            </div>
+        </form>
     </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to Home</a>
 </div>
 
 @section Scripts {
