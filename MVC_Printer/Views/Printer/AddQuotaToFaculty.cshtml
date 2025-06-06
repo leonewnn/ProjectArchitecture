@@ -20,6 +20,12 @@
     </div>
 
     <h5>Select Students:</h5>
+    
+    <!-- Bouton pour ajouter à tous les étudiants -->
+    <div class="mb-3">
+        <button type="button" class="btn btn-warning btn-sm" onclick="addToAllStudents()">Add Money to All Students</button>
+    </div>
+    
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -34,7 +40,7 @@
                 {
                     <tr>
                         <td>
-                            <input type="checkbox" name="SelectedUsernames" value="@Model.Users[i].Username" />
+                            <input type="checkbox" name="SelectedUsernames" value="@Model.Users[i].Username" class="student-checkbox" />
                         </td>
                         <td>@Model.Users[i].Username</td>
                         <td>@Model.Users[i].Balance.ToString("0.00") CHF</td>
@@ -56,4 +62,14 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        function addToAllStudents() {
+            // Cocher toutes les cases et soumettre le formulaire
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            document.querySelector('form').submit();
+        }
+    </script>
 }
