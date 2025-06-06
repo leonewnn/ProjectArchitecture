@@ -18,6 +18,13 @@ builder.Services.AddHttpClient<IPrintService, PrintService>(client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
+// ⭐ CORRECTION : Ajouter HttpClient pour FacultyService
+builder.Services.AddHttpClient<IFacultyService, FacultyService>(client =>
+{
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

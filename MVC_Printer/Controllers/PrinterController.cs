@@ -10,11 +10,13 @@ namespace MVC_Printer.Controllers
     {
         private readonly IUserService _userService;
         private readonly IPrintService _printService;
+        private readonly IFacultyService _facultyService;
 
-        public PrinterController(IUserService userService, IPrintService printService)
+        public PrinterController(IPrintService printService, IUserService userService, IFacultyService facultyService)
         {
-            _userService = userService;
             _printService = printService;
+            _userService = userService;
+            _facultyService = facultyService;
         }
 
         public IActionResult Index()
@@ -71,6 +73,92 @@ namespace MVC_Printer.Controllers
             {
                 ModelState.AddModelError("", ex.Message);
                 return View(model);
+            }
+        }
+
+        // GET: Printer/SelectFaculty
+        public async Task<IActionResult> SelectFaculty()
+        {
+            try
+            {
+                var faculties = await _facultyService.GetFaculties();
+                return View(faculties);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading faculties: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+        }
+
+        // GET: Printer/AddQuotaToFaculty/{facultyId}
+        public async Task<IActionResult> AddQuotaToFaculty(int facultyId)
+        {
+            try
+            {
+                var faculties = await _facultyService.GetFaculties();
+                var faculty = faculties.FirstOrDefault(f => f.FacultyId == facultyId);
+                
+                if (faculty == null)
+                {
+                    TempData["Error"] = "Faculty not found";
+                    return RedirectToAction("SelectFaculty");
+                }
+
+                var users = await _facultyService.GetUsersByFaculty(facultyId);
+                
+                var viewModel = new AddQuotaToFacultyViewModel
+                {
+                    FacultyId = facultyId,
+                    FacultyName = faculty.Name,
+                    Users = users
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading faculty users: " + ex.Message;
+                return RedirectToAction("SelectFaculty");
+            }
+        }
+
+        // POST: Printer/AddQuotaToFaculty
+        [HttpPost]
+        public async Task<IActionResult> AddQuotaToFaculty(AddQuotaToFacultyViewModel model)
+        {
+            try
+            {
+                if (model.Amount <= 0)
+                {
+                    TempData["Error"] = "Amount must be greater than 0";
+                    return RedirectToAction("AddQuotaToFaculty", new { facultyId = model.FacultyId });
+                }
+
+                if (model.SelectedUsernames == null || !model.SelectedUsernames.Any())
+                {
+                    TempData["Error"] = "Please select at least one student";
+                    return RedirectToAction("AddQuotaToFaculty", new { facultyId = model.FacultyId });
+                }
+
+                foreach (var username in model.SelectedUsernames)
+                {
+                    var addMoneyRequest = new AddMoneyViewModel
+                    {
+                        Username = username,
+                        Amount = model.Amount
+                    };
+                    
+                    await _userService.AddMoney(addMoneyRequest);
+                }
+
+                TempData["Success"] = $"Successfully added {model.Amount:C} CHF to {model.SelectedUsernames.Count} student(s)";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error adding money: " + ex.Message;
+                return RedirectToAction("AddQuotaToFaculty", new { facultyId = model.FacultyId });
             }
         }
 

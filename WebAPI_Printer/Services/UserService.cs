@@ -23,15 +23,16 @@ namespace WebAPI_Printer.Services
 
             User user = null;
 
-            if (!string.IsNullOrEmpty(request.CardId))
+            // ⭐ CORRECTION: Améliorer la validation pour gérer les valeurs null/vides
+            if (!string.IsNullOrWhiteSpace(request.CardId))
             {
                 user = await _context.Users
-                    .SingleOrDefaultAsync(u => u.CardId == request.CardId);
+                    .SingleOrDefaultAsync(u => u.CardId == request.CardId.Trim());
             }
-            else if (!string.IsNullOrEmpty(request.Username))
+            else if (!string.IsNullOrWhiteSpace(request.Username))
             {
                 user = await _context.Users
-                    .SingleOrDefaultAsync(u => u.Username == request.Username);
+                    .SingleOrDefaultAsync(u => u.Username == request.Username.Trim());
             }
             else
             {
