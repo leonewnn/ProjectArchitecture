@@ -17,7 +17,7 @@ namespace WebAPI_Printer.Controllers
             _printService = printService;
         }
 
-        // GET api/Print/GetQuota/{userId}
+  
         [HttpGet("GetQuota/{userId}")]
         public async Task<ActionResult<PrintQuotaResultDto>> GetQuota(string userId)
         {
