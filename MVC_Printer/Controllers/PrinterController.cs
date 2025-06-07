@@ -33,16 +33,11 @@ namespace MVC_Printer.Controllers
                 return RedirectToAction("Index");
             }
 
-            try
-            {
+           
                 var quota = await _printService.GetQuota(userId);
                 return View("QuotaResult", quota);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error: {ex.Message}";
-                return RedirectToAction("Index");
-            }
+            
+         
         }
 
         [HttpGet]
@@ -54,41 +49,26 @@ namespace MVC_Printer.Controllers
         [HttpPost]
         public async Task<IActionResult> AddMoney(AddMoneyViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            if (string.IsNullOrEmpty(model.CardId) && string.IsNullOrEmpty(model.Username))
+            if (model.Amount <= 0)
             {
-                ModelState.AddModelError("", "Provide either Card ID or Username");
+                TempData["Error"] = "Amount must be greater than 0";
                 return View(model);
             }
-
-            try
-            {
+           
                 await _userService.AddMoney(model);
                 TempData["Success"] = $"Successfully added {model.Amount:C} CHF";
                 return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-                return View(model);
-            }
+            
+          
         }
 
         // GET: Printer/SelectFaculty
         public async Task<IActionResult> SelectFaculty()
         {
-            try
-            {
-                var faculties = await _facultyService.GetFaculties();
+           var faculties = await _facultyService.GetFaculties();
                 return View(faculties);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Error loading faculties: " + ex.Message;
-                return RedirectToAction("Index");
-            }
+            
+            
         }
 
         // GET: Printer/AddQuotaToFaculty/{facultyId}

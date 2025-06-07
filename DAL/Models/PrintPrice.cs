@@ -8,7 +8,7 @@ namespace DAL.Models
 //asfddfqwrestddwe
         [Key]
         [MaxLength(10)]
-        public string TypeCode { get; set; } = string.Empty;
+        public string TypeCode { get; set; } 
         
         [Column(TypeName = "decimal(6,4)")]
         public decimal PricePerPage { get; set; }

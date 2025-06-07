@@ -8,39 +8,17 @@ namespace MVC_Printer.Services
     {
         private readonly HttpClient _client;
         private readonly string _baseUrl;
-        private readonly ILogger<UserService> _logger;
 
-        public UserService(HttpClient client, IConfiguration configuration, ILogger<UserService> logger)
+        public UserService(HttpClient client, IConfiguration configuration)
         {
             _client = client;
-            _baseUrl = configuration["WebAPI:BaseUrl"] ?? "https://localhost:7086/api/";
-            _logger = logger;
+            _baseUrl = configuration["WebAPI:BaseUrl"];
         }
 
         public async Task AddMoney(AddMoneyViewModel request)
         {
-            try
-            {
-                var dto = new
-                {
-                    CardId = request.CardId,
-                    Username = request.Username,
-                    Amount = request.Amount
-                };
-
-                var json = JsonSerializer.Serialize(dto);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                _logger.LogInformation("Calling API: {Url}", $"{_baseUrl}User/AddMoney");
-
-                var response = await _client.PostAsync($"{_baseUrl}User/AddMoney", content);
-                response.EnsureSuccessStatusCode();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error adding money via API");
-                throw;
-            }
+            var response = await _client.PostAsJsonAsync($"{_baseUrl}User/AddMoney", request);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace WebAPI_Printer.Controllers
             _facultyService = facultyService;
         }
 
-        // GET api/Faculty/GetUsersByFaculty/{facultyId}
+        
         [HttpGet("GetUsersByFaculty/{facultyId}")]
         public async Task<ActionResult<List<UserBalanceDto>>> GetUsersByFaculty(int facultyId)
         {
@@ -26,7 +26,7 @@ namespace WebAPI_Printer.Controllers
             return Ok(users);
         }
 
-        // GET api/Faculty/GetFaculties
+        
         [HttpGet("GetFaculties")]
         public async Task<ActionResult<List<FacultyDto>>> GetFaculties()
         {

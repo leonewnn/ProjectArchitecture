@@ -5,9 +5,7 @@ namespace WebAPI_Printer.Extensions
 {
     public static class ConverterExtensions
     {
-        /// <summary>
-        /// Convertit une entité User en UserBalanceDto.
-        /// </summary>
+      
         public static UserBalanceDto ToUserBalanceDto(this User user)
         {
             return new UserBalanceDto
@@ -18,9 +16,7 @@ namespace WebAPI_Printer.Extensions
             };
         }
 
-        /// <summary>
-        /// Convertit une entité Faculty en FacultyDto.
-        /// </summary>
+      
         public static FacultyDto ToFacultyDto(this Faculty faculty)
         {
             return new FacultyDto
@@ -30,9 +26,7 @@ namespace WebAPI_Printer.Extensions
             };
         }
 
-        /// <summary>
-        /// Convertit une entité PrintPrice + solde CHF en FormatPagesDto.
-        /// </summary>
+      
         public static FormatPagesDto ToFormatPagesDto(this PrintPrice price, decimal quotaChf)
         {
             return new FormatPagesDto
@@ -42,9 +36,7 @@ namespace WebAPI_Printer.Extensions
             };
         }
 
-        /// <summary>
-        /// Convertit un User et une liste de PrintPrice en PrintQuotaResultDto.
-        /// </summary>
+        
         public static PrintQuotaResultDto ToPrintQuotaResultDto(this User user, List<PrintPrice> prices)
         {
             var formats = prices

@@ -6,15 +6,15 @@ namespace DAL.Models
     public class User
     {
         [Key]
-        public string Uid { get; set; } = string.Empty;
+        public string Uid { get; set; } 
         
         [Required]
         [MaxLength(100)]
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; set; } 
         
         [Required]
         [MaxLength(50)]
-        public string CardId { get; set; } = string.Empty;
+        public string CardId { get; set; } 
         
         public int FacultyId { get; set; }
         
