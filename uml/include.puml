@@ -1,0 +1,222 @@
+@startuml
+class MyPrintDBContext {
+    + MyPrintDBContext()
+    + MyPrintDBContext(options:DbContextOptions<MyPrintDBContext>)
+    # <<override>> OnConfiguring(optionsBuilder:DbContextOptionsBuilder) : void
+    # <<override>> OnModelCreating(modelBuilder:ModelBuilder) : void
+}
+class "DbSet`1"<T> {
+}
+DbContext <|-- MyPrintDBContext
+MyPrintDBContext --> "Users<User>" "DbSet`1"
+MyPrintDBContext --> "Faculties<Faculty>" "DbSet`1"
+MyPrintDBContext --> "PrintPrices<PrintPrice>" "DbSet`1"
+class "AddHttpClient`2"<T1,T2> {
+}
+class Program {
+    {static} - Main(args:string[]) : void
+}
+class Program {
+    {static} - Main(args:string[]) : void
+}
+class Program {
+    + {static} Main(args:string[]) : void
+    {static} - SeedDatabase(context:MyPrintDBContext) : void
+}
+class InitialCreate <<partial>> {
+    # <<override>> Up(migrationBuilder:MigrationBuilder) : void
+    # <<override>> Down(migrationBuilder:MigrationBuilder) : void
+}
+Migration <|-- InitialCreate
+class InitialCreate <<partial>> {
+    # <<override>> BuildTargetModel(modelBuilder:ModelBuilder) : void
+}
+class MyPrintDBContextModelSnapshot <<partial>> {
+    # <<override>> BuildModel(modelBuilder:ModelBuilder) : void
+}
+ModelSnapshot <|-- MyPrintDBContextModelSnapshot
+class Faculty {
+    + FacultyId : int <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+}
+class "ICollection`1"<T> {
+}
+Faculty o-> "Users<User>" "ICollection`1"
+class PrintPrice {
+    + TypeCode : string <<get>> <<set>>
+    + PricePerPage : decimal <<get>> <<set>>
+}
+class User {
+    + Uid : string <<get>> <<set>>
+    + Username : string <<get>> <<set>>
+    + CardId : string <<get>> <<set>>
+    + FacultyId : int <<get>> <<set>>
+    + QuotaChf : decimal <<get>> <<set>>
+}
+User o-> "Faculty" Faculty
+class PrinterController {
+    + PrinterController(printService:IPrintService, userService:IUserService, facultyService:IFacultyService)
+    + Index() : IActionResult
+    + <<async>> GetQuota(userId:string) : Task<IActionResult>
+    + AddMoney() : IActionResult
+    + <<async>> AddMoney(model:AddMoneyViewModel) : Task<IActionResult>
+    + <<async>> SelectFaculty() : Task<IActionResult>
+    + <<async>> AddQuotaToFaculty(facultyId:int) : Task<IActionResult>
+    + <<async>> AddQuotaToFaculty(model:AddQuotaToFacultyViewModel) : Task<IActionResult>
+    + Error() : IActionResult
+}
+Controller <|-- PrinterController
+PrinterController --> "_userService" IUserService
+PrinterController --> "_printService" IPrintService
+PrinterController --> "_facultyService" IFacultyService
+class AddMoneyViewModel {
+    + CardId : string? <<get>> <<set>>
+    + Username : string? <<get>> <<set>>
+    + Amount : decimal <<get>> <<set>>
+}
+class AddQuotaToFacultyViewModel {
+    + FacultyId : int <<get>> <<set>>
+    + FacultyName : string <<get>> <<set>> = ""
+    + Amount : decimal <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+AddQuotaToFacultyViewModel o-> "Users<UserBalanceViewModel>" "List`1"
+AddQuotaToFacultyViewModel o-> "SelectedUsernames<string>" "List`1"
+class ErrorViewModel {
+    + RequestId : string? <<get>> <<set>>
+    + ShowRequestId : bool <<get>>
+}
+class FacultyViewModel {
+    + FacultyId : int <<get>> <<set>>
+    + Name : string <<get>> <<set>> = ""
+}
+class PrintQuotaViewModel {
+    + UserId : string <<get>> <<set>>
+    + QuotaChf : decimal <<get>> <<set>>
+}
+class FormatPagesViewModel {
+    + TypeCode : string <<get>> <<set>>
+    + PagesAvailable : int <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+PrintQuotaViewModel o-> "Formats<FormatPagesViewModel>" "List`1"
+class UserBalanceViewModel {
+    + Uid : string <<get>> <<set>> = ""
+    + Username : string <<get>> <<set>> = ""
+    + Balance : decimal <<get>> <<set>>
+    + IsSelected : bool <<get>> <<set>>
+}
+class FacultyService {
+    - <<readonly>> _baseUrl : string
+    + FacultyService(client:HttpClient, configuration:IConfiguration)
+    + <<async>> GetFaculties() : Task<List<FacultyViewModel>>
+    + <<async>> GetUsersByFaculty(facultyId:int) : Task<List<UserBalanceViewModel>>
+}
+IFacultyService <|-- FacultyService
+FacultyService --> "_client" HttpClient
+interface IFacultyService {
+    GetFaculties() : Task<List<FacultyViewModel>>
+    GetUsersByFaculty(facultyId:int) : Task<List<UserBalanceViewModel>>
+}
+interface IPrintService {
+    GetQuota(userId:string) : Task<PrintQuotaViewModel>
+}
+interface IUserService {
+    AddMoney(request:AddMoneyViewModel) : Task
+}
+class PrintService {
+    - <<readonly>> _baseUrl : string
+    + PrintService(client:HttpClient, configuration:IConfiguration)
+    + <<async>> GetQuota(userId:string) : Task<PrintQuotaViewModel>
+}
+IPrintService <|-- PrintService
+PrintService --> "_client" HttpClient
+class UserService {
+    - <<readonly>> _baseUrl : string
+    + UserService(client:HttpClient, configuration:IConfiguration)
+    + <<async>> AddMoney(request:AddMoneyViewModel) : Task
+}
+IUserService <|-- UserService
+UserService --> "_client" HttpClient
+class FacultyController {
+    + FacultyController(facultyService:IFacultyService)
+    + <<async>> GetUsersByFaculty(facultyId:int) : Task<ActionResult<List<UserBalanceDto>>>
+    + <<async>> GetFaculties() : Task<ActionResult<List<FacultyDto>>>
+}
+ControllerBase <|-- FacultyController
+FacultyController --> "_facultyService" IFacultyService
+class PrintController {
+    + PrintController(printService:IPrintService)
+    + <<async>> GetQuota(userId:string) : Task<ActionResult<PrintQuotaResultDto>>
+}
+ControllerBase <|-- PrintController
+PrintController --> "_printService" IPrintService
+class UserController {
+    + UserController(userService:IUserService)
+    + <<async>> AddMoney(request:AddMoneyDto) : Task<IActionResult>
+}
+ControllerBase <|-- UserController
+UserController --> "_userService" IUserService
+class ConverterExtensions <<static>> {
+    + {static} ToUserBalanceDto(user:User) : UserBalanceDto
+    + {static} ToFacultyDto(faculty:Faculty) : FacultyDto
+    + {static} ToFormatPagesDto(price:PrintPrice, quotaChf:decimal) : FormatPagesDto
+    + {static} ToPrintQuotaResultDto(user:User, prices:List<PrintPrice>) : PrintQuotaResultDto
+}
+class AddMoneyDto {
+    + CardId : string? <<get>> <<set>>
+    + Username : string? <<get>> <<set>>
+    + Amount : decimal <<get>> <<set>>
+}
+class FacultyDto {
+    + FacultyId : int <<get>> <<set>>
+    + Name : string <<get>> <<set>>
+}
+class FormatPagesDto {
+    + TypeCode : string <<get>> <<set>>
+    + PagesAvailable : int <<get>> <<set>>
+}
+class PrintQuotaResultDto {
+    + UserId : string <<get>> <<set>>
+    + QuotaChf : decimal <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+PrintQuotaResultDto --> "Formats<FormatPagesDto>" "List`1"
+class UserBalanceDto {
+    + Uid : string <<get>> <<set>>
+    + Username : string <<get>> <<set>>
+    + Balance : decimal <<get>> <<set>>
+}
+class FacultyService {
+    + FacultyService(context:MyPrintDBContext)
+    + <<async>> GetUsersByFaculty(facultyId:int) : Task<List<UserBalanceDto>>
+    + <<async>> GetFaculties() : Task<List<FacultyDto>>
+}
+IFacultyService <|-- FacultyService
+FacultyService --> "_context" MyPrintDBContext
+interface IFacultyService {
+    GetUsersByFaculty(facultyId:int) : Task<List<UserBalanceDto>>
+    GetFaculties() : Task<List<FacultyDto>>
+}
+interface IPrintService {
+    GetQuota(userId:string) : Task<PrintQuotaResultDto>
+}
+interface IUserService {
+    AddMoney(request:AddMoneyDto) : Task
+}
+class PrintService {
+    + PrintService(context:MyPrintDBContext)
+    + <<async>> GetQuota(userId:string) : Task<PrintQuotaResultDto>
+}
+IPrintService <|-- PrintService
+PrintService --> "_context" MyPrintDBContext
+class UserService {
+    + UserService(context:MyPrintDBContext)
+    + <<async>> AddMoney(request:AddMoneyDto) : Task
+}
+IUserService <|-- UserService
+UserService --> "_context" MyPrintDBContext
+@enduml
