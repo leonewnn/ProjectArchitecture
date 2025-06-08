@@ -74,16 +74,11 @@ namespace MVC_Printer.Controllers
         // GET: Printer/AddQuotaToFaculty/{facultyId}
         public async Task<IActionResult> AddQuotaToFaculty(int facultyId)
         {
-            try
-            {
+            
                 var faculties = await _facultyService.GetFaculties();
                 var faculty = faculties.FirstOrDefault(f => f.FacultyId == facultyId);
                 
-                if (faculty == null)
-                {
-                    TempData["Error"] = "Faculty not found";
-                    return RedirectToAction("SelectFaculty");
-                }
+               
 
                 var users = await _facultyService.GetUsersByFaculty(facultyId);
                 
@@ -95,12 +90,8 @@ namespace MVC_Printer.Controllers
                 };
 
                 return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Error loading faculty users: " + ex.Message;
-                return RedirectToAction("SelectFaculty");
-            }
+            
+           
         }
 
         // POST: Printer/AddQuotaToFaculty
